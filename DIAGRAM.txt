@@ -6,7 +6,7 @@ Alice is a client who want to open a payment channel with Bob the merchant.
   [ Alice ]                             [ Bob ]
       |                                    |
       |--- Initiate PC ------------------->|
-      |<---------------- Return address ---|
+      |<---------------- Return pubkey ----|
       |                                    |
       |                                    |
 **Serialize                                |
@@ -28,3 +28,4 @@ Alice is a client who want to open a payment channel with Bob the merchant.
                 PC now closed
 
 PC: "Payment Channel"
+pubkey: "Public key"
