@@ -48,7 +48,8 @@ async function main () {
 		Image: 'xanimo/dogecoin-core:ubuntu',
 		name: 'dogecoind_regtest',
 		PortBindings: { ['18444/tcp']: [{ HostIp: '0.0.0.0', HostPort: '18444' }], ['18332/tcp']: [{ HostIp: '0.0.0.0', HostPort: '18332' }] },
-		NetworkMode: 'host'
+		NetworkMode: 'host',
+    Binds: ['/home/lola/Workspace/Dogecoin/doge-payment-channel/data/alert.log:/root/.dogecoin/alert.log'],
 	})
 	
 	console.log('container created')
@@ -60,6 +61,11 @@ async function main () {
 	// Wait 5 seconds
   // Needed otherwise we try to connect when node is not ready
   await new Promise(resolve => setTimeout(resolve, 5000));
+
+  // We need to change permissions because container is running root
+  container.exec({ Cmd: ['chown', '1000:1000', '/root/.dogecoin/', '-R'] }, async function (rep, exec) { 
+    await exec.start({})
+  })
 
   /*
       Setup
@@ -108,6 +114,7 @@ async function main () {
   })
 
   console.log(`P2SH address : ${p2sh.address}`)
+
 
   // Create initial transaction that funds a multisig
 	result = await jsonRPC('getrawtransaction', [txid])
@@ -213,7 +220,8 @@ async function main () {
 
   const finalTransaction = psbt3.extractTransaction(true).toHex()
   console.log(finalTransaction)
-  await jsonRPC('sendrawtransaction', [finalTransaction])
+  result = await jsonRPC('sendrawtransaction', [finalTransaction])
+  console.log(result.data)
 
   console.log('PAYMENT CHANNEL CLOSE!')
 
